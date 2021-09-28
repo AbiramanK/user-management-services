@@ -1,5 +1,6 @@
 import express, { Router, Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
+import cors from 'cors';
 import { UserModel } from './model'
 
 const app = express();
@@ -7,8 +8,9 @@ const router = Router();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use('/', router);
+app.use(cors());
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 
 const dbHost = 'localhost';
 const dbPort = 27017;
@@ -44,7 +46,7 @@ router.post('/user', async(req: Request, res: Response, next: NextFunction) => {
         message
     } = req.body;
 
-    const oldUser = await UserModel.findOne({ mobileNumber, email });
+    const oldUser = await UserModel.findOne({ $or: [{mobileNumber}, {email}] });
 
     if (oldUser) {
         return res.json({
